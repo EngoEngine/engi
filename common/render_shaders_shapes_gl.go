@@ -1,3 +1,5 @@
+//+build !vulkan
+
 package common
 
 import (
@@ -131,18 +133,18 @@ func (l *legacyShader) Pre() {
 }
 
 func (l *legacyShader) updateBuffer(ren *RenderComponent, space *SpaceComponent) {
-	if len(ren.BufferContent) == 0 {
-		ren.BufferContent = make([]float32, l.computeBufferSize(ren.Drawable)) // because we add at most this many elements to it
+	if len(ren.BufferData.BufferContent) == 0 {
+		ren.BufferData.BufferContent = make([]float32, l.computeBufferSize(ren.Drawable)) // because we add at most this many elements to it
 	}
-	if changed := l.generateBufferContent(ren, space, ren.BufferContent); !changed {
+	if changed := l.generateBufferContent(ren, space, ren.BufferData.BufferContent); !changed {
 		return
 	}
 
-	if ren.Buffer == nil {
-		ren.Buffer = engo.Gl.CreateBuffer()
+	if ren.BufferData.BufferContent == nil {
+		ren.BufferData.Buffer = engo.Gl.CreateBuffer()
 	}
-	engo.Gl.BindBuffer(engo.Gl.ARRAY_BUFFER, ren.Buffer)
-	engo.Gl.BufferData(engo.Gl.ARRAY_BUFFER, ren.BufferContent, engo.Gl.STATIC_DRAW)
+	engo.Gl.BindBuffer(engo.Gl.ARRAY_BUFFER, ren.BufferData.Buffer)
+	engo.Gl.BufferData(engo.Gl.ARRAY_BUFFER, ren.BufferData.BufferContent, engo.Gl.STATIC_DRAW)
 }
 
 func (l *legacyShader) computeBufferSize(draw Drawable) int {
@@ -486,14 +488,14 @@ func (l *legacyShader) generateBufferContent(ren *RenderComponent, space *SpaceC
 }
 
 func (l *legacyShader) Draw(ren *RenderComponent, space *SpaceComponent) {
-	if l.lastBuffer != ren.Buffer || ren.Buffer == nil {
+	if l.lastBuffer != ren.BufferData.Buffer || ren.BufferData.Buffer == nil {
 		l.updateBuffer(ren, space)
 
-		engo.Gl.BindBuffer(engo.Gl.ARRAY_BUFFER, ren.Buffer)
+		engo.Gl.BindBuffer(engo.Gl.ARRAY_BUFFER, ren.BufferData.Buffer)
 		engo.Gl.VertexAttribPointer(l.inPosition, 2, engo.Gl.FLOAT, false, 12, 0)
 		engo.Gl.VertexAttribPointer(l.inColor, 4, engo.Gl.UNSIGNED_BYTE, true, 12, 8)
 
-		l.lastBuffer = ren.Buffer
+		l.lastBuffer = ren.BufferData.Buffer
 	}
 
 	if space.Rotation != 0 {

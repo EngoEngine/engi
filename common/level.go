@@ -3,7 +3,6 @@ package common
 import (
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/math"
-	"github.com/EngoEngine/gl"
 )
 
 const (
@@ -261,7 +260,7 @@ func (t *Tile) Width() float32 {
 }
 
 // Texture returns the tile's Image texture
-func (t *Tile) Texture() *gl.Texture {
+func (t *Tile) Texture() TextureID {
 	return t.Image.id
 }
 

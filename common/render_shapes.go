@@ -4,7 +4,6 @@ import (
 	"image/color"
 
 	"github.com/EngoEngine/engo"
-	"github.com/EngoEngine/gl"
 )
 
 // TriangleType is the type of triangle: Right or Isosceles.
@@ -27,7 +26,7 @@ type Triangle struct {
 }
 
 // Texture always returns nil. Triangle is drawable without a Texture. This implements the Drawable interface.
-func (Triangle) Texture() *gl.Texture { return nil }
+func (Triangle) Texture() TextureID { return nil }
 
 // Width always returns 0. This implements the Drawable interface.
 func (Triangle) Width() float32 { return 0 }
@@ -48,7 +47,7 @@ type Rectangle struct {
 }
 
 // Texture always returns nil. Rectangle is drawable without a Texture. This implements the Drawable interface.
-func (Rectangle) Texture() *gl.Texture { return nil }
+func (Rectangle) Texture() TextureID { return nil }
 
 // Width always returns 0. This implements the Drawable interface.
 func (Rectangle) Width() float32 { return 0 }
@@ -71,7 +70,7 @@ type Circle struct {
 }
 
 // Texture always returns nil. Circle is drawable without a Texture. This implements the Drawable interface.
-func (Circle) Texture() *gl.Texture { return nil }
+func (Circle) Texture() TextureID { return nil }
 
 // Width always returns 0. This implements the Drawable interface.
 func (Circle) Width() float32 { return 0 }
@@ -96,7 +95,7 @@ type Curve struct {
 }
 
 // Texture always returns nil. Curve is drawable without a Texture. This implements the Drawable interface.
-func (Curve) Texture() *gl.Texture { return nil }
+func (Curve) Texture() TextureID { return nil }
 
 // Width always returns 0. This implements the Drawable interface.
 func (Curve) Width() float32 { return 0 }
@@ -124,7 +123,7 @@ type ComplexTriangles struct {
 }
 
 // Texture always returns nil. ComplexTriangles is drawable without a Texture. This implements the Drawable interface.
-func (ComplexTriangles) Texture() *gl.Texture { return nil }
+func (ComplexTriangles) Texture() TextureID { return nil }
 
 // Width always returns 0. This implements the Drawable interface.
 func (ComplexTriangles) Width() float32 { return 0 }

@@ -8,7 +8,6 @@ import (
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
-	"github.com/EngoEngine/gl"
 )
 
 const (
@@ -22,9 +21,9 @@ func (renderChangeMessage) Type() string {
 	return "renderChangeMessage"
 }
 
-// Drawable is that which can be rendered to OpenGL.
+// Drawable is that which can be rendered by the renderer.
 type Drawable interface {
-	Texture() *gl.Texture
+	Texture() TextureID
 	Width() float32
 	Height() float32
 	View() (float32, float32, float32, float32)
@@ -73,12 +72,9 @@ type RenderComponent struct {
 	// Do not set to anything other than NoRepeat for textures in a sprite sheet.
 	// This does not yet work with sprite sheets.
 	Repeat TextureRepeating
-	// Buffer represents the buffer object itself
-	// Avoid using it unless your are writing a custom shader
-	Buffer *gl.Buffer
-	// BufferContent contains the buffer data
-	// Avoid using it unless your are writing a custom shader
-	BufferContent []float32
+	// BufferData is the data representing the graphics buffer. Don't use it unless
+	// you're writing a custom shader.
+	BufferData BufferData
 	// StartZIndex defines the initial Z-Index. Z-Index defines the order which the content is drawn to the
 	// screen. Higher z-indices are drawn on top of lower ones. Beware that you must use `SetZIndex` function to change
 	// the Z-Index.
@@ -92,6 +88,9 @@ type RenderComponent struct {
 
 // SetShader sets the shader used by the RenderComponent.
 func (r *RenderComponent) SetShader(s Shader) {
+	if t, ok := s.(TextureShader); ok {
+		t.AddTexture(r.Drawable)
+	}
 	r.shader = s
 	engo.Mailbox.Dispatch(&renderChangeMessage{})
 }
@@ -101,19 +100,19 @@ func (r *RenderComponent) ensureShader() {
 	if r.shader == nil {
 		switch r.Drawable.(type) {
 		case Triangle:
-			r.shader = LegacyShader
+			r.SetShader(LegacyShader)
 		case Circle:
-			r.shader = LegacyShader
+			r.SetShader(LegacyShader)
 		case Rectangle:
-			r.shader = LegacyShader
+			r.SetShader(LegacyShader)
 		case ComplexTriangles, Curve:
-			r.shader = LegacyShader
+			r.SetShader(LegacyShader)
 		case Text:
-			r.shader = TextShader
+			r.SetShader(TextShader)
 		case Blendmap:
-			r.shader = BlendmapShader
+			r.SetShader(BlendmapShader)
 		default:
-			r.shader = DefaultShader
+			r.SetShader(DefaultShader)
 		}
 	}
 }
@@ -231,7 +230,7 @@ func (rs *RenderSystem) New(w *ecs.World) {
 		if err := initShaders(w); err != nil {
 			panic(err)
 		}
-		engo.Gl.Enable(engo.Gl.MULTISAMPLE)
+		enableMultisample()
 	}
 
 	engo.Mailbox.Listen("renderChangeMessage", func(engo.Message) {
@@ -345,7 +344,7 @@ func (rs *RenderSystem) Update(dt float32) {
 		rs.newCamera = false
 	}
 
-	engo.Gl.Clear(engo.Gl.COLOR_BUFFER_BIT)
+	clearScreen()
 
 	preparedCullingShaders := make(map[CullingShader]struct{})
 	var cullingShader CullingShader // current culling shader
@@ -409,8 +408,6 @@ func (rs *RenderSystem) Update(dt float32) {
 // SetBackground sets the OpenGL ClearColor to the provided color.
 func SetBackground(c color.Color) {
 	if !engo.Headless() {
-		r, g, b, a := c.RGBA()
-
-		engo.Gl.ClearColor(float32(r)/0xffff, float32(g)/0xffff, float32(b)/0xffff, float32(a)/0xffff)
+		setBackground(c)
 	}
 }

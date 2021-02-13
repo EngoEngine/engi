@@ -1,3 +1,5 @@
+//+build !vulkan
+
 package common
 
 import (
@@ -33,7 +35,7 @@ func (bm Blendmap) Height() float32 {
 }
 
 // Texture returns the OpenGL ID of the blendmap.
-func (bm Blendmap) Texture() *gl.Texture {
+func (bm Blendmap) Texture() TextureID {
 	return bm.Map.id
 }
 
@@ -409,9 +411,9 @@ func (s *blendmapShader) updateBuffer(ren *RenderComponent, space *SpaceComponen
 	// For backwards compatibility, ren.Buffer is set to the VBO and ren.BufferContent
 	// is set to the slice of the vertex buffer for the current sprite. This same slice is
 	// populated with vertex data via generateBufferContent.
-	ren.Buffer = s.vertexBuffer
-	ren.BufferContent = s.vertices[s.idx : s.idx+20]
-	s.generateBufferContent(ren, space, ren.BufferContent)
+	ren.BufferData.Buffer = s.vertexBuffer
+	ren.BufferData.BufferContent = s.vertices[s.idx : s.idx+20]
+	s.generateBufferContent(ren, space, ren.BufferData.BufferContent)
 }
 
 func (s *blendmapShader) makeModelMatrix(ren *RenderComponent, space *SpaceComponent) *engo.Matrix {

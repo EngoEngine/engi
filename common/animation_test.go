@@ -8,14 +8,13 @@ import (
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
-	"github.com/EngoEngine/gl"
 )
 
 type TestDrawable struct {
 	ID int
 }
 
-func (*TestDrawable) Texture() *gl.Texture { return nil }
+func (*TestDrawable) Texture() TextureID { return nil }
 
 func (*TestDrawable) Width() float32 { return 0 }
 

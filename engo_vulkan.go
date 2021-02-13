@@ -19,6 +19,9 @@ var (
 	// Window is the glfw.Window used for engo
 	Window *glfw.Window
 
+	// Device is the VkDevice used for rendering
+	Device *VkDevice
+
 	cursorArrow     *glfw.Cursor
 	cursorIBeam     *glfw.Cursor
 	cursorCrosshair *glfw.Cursor
@@ -27,6 +30,8 @@ var (
 	cursorVResize   *glfw.Cursor
 
 	scale = float32(1)
+
+	engoVersion = []int{1, 0, 5}
 )
 
 func init() {
@@ -100,6 +105,9 @@ func CreateWindow(title string, width, height int, fullscreen bool, msaa int) {
 	}
 
 	Window, err = glfw.CreateWindow(width, height, title, monitor, nil)
+	fatalErr(err)
+
+	err = Device.init()
 	fatalErr(err)
 
 	if !fullscreen {

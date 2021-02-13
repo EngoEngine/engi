@@ -7,7 +7,6 @@ import (
 	"path"
 
 	"github.com/EngoEngine/engo"
-	"github.com/EngoEngine/gl"
 )
 
 // TextureAtlas is a collection of small textures grouped into a big image
@@ -37,8 +36,8 @@ type SubTexture struct {
 
 // TextureAtlasResource contains reference to a loaded TextureAtlas and the texture of the main image
 type TextureAtlasResource struct {
-	// texture is a gl.Texture reference of the main image
-	texture *gl.Texture
+	// texture is a the TextureID of the main image
+	texture TextureID
 	// url is the location of the xml file
 	url string
 	// Atlas is the TextureAtlas filled with data from the parsed XML file

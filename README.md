@@ -47,10 +47,25 @@ The `common` package contains our ECS implementations of common game development
 4. Finally, if you run into problems, if you've encountered a bug, or want to request a feature, feel free to shoot
 us a DM or [create an issue](https://github.com/EngoEngine/engo/issues/new).
 
+## Build Tags
+There are several different build tags available to swap out the renderer as well as
+the Window Systems. Currently, the tags are as follows
+
+| tag | what it does | requirements |
+|:---:|---|---|
+| -mobilebind | Builds the file as an .aar library to link to an apk. For building mobile apps that require functionality not provided by gomobile, such as 3rd party O-Auth. | The ability to build apk files, either through Android Studio, maven, or some other way. |
+| -sdl | Uses SDL rather than glfw to build the window system. | SDL installed. A good walkthrough can be found [here](https://github.com/veandco/go-sdl2#requirements) |
+| -vulkan | Uses Vulkan as the renderer rather than OpenGL. Does not work on mobile (yet!). | Vulkan installed. How to install on [MacOS](https://github.com/KhronosGroup/MoltenVK#building-from-the-command-line), [Windows](https://vulkan.lunarg.com/doc/view/1.1.121.2/windows/getting_started.html), and [Linux](https://vulkan.lunarg.com/doc/view/1.1.114.0/linux/getting_started.html) |
+| -headless | Does not build the OpenGL context at all. For use on servers or other places where a framebuffer isn't accessible. Use in CONJUNCTION with the Headless Run Option! | No requirements |
+
 ## Breaking Changes Since v1.0
 Engo is always undergoing a lot of optimizations and constantly gets new features. However, this sometimes means things break. In order to make transitioning easier for you,
 we have a list of those changes, with the most recent being at the top. If you run into any problems, please contact us at [gitter](https://gitter.im/EngoEngine/engo).
 
+* common.RenderSystem's BufferContent and Buffer that allow access to the render buffer for custom shaders has been
+wrapped into BufferData. This allows access to OpenGL and Vulkan specific buffers for custom shaders.
+* common.Drawable has been changed so that it does not contain any references to the specific renderiing backend.
+The interface now uses `Texture() TextureID` rather than `*gl.Texture`.
 * TMXObject Width and Height is in pixels, and can be fractional. This has changed from an int to a float64.
 * TMXTileset now uses a Spritesheet instead of a Texture. This helps keep track of the guid better and allows the gid to not start at zero and have skips in it, as well as for borders and spacing in the tile sheet.
 * TMX Level's objects have all been rolled into Object rather than have separate things like "PolyLineObject". This is to be

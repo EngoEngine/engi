@@ -61,6 +61,19 @@ func TestRunHeadlessNoRunDefaults(t *testing.T) {
 	if opts.Height != 800 {
 		t.Error("Height was not defaulted to 800")
 	}
+
+	if opts.ApplicationMajorVersion != 0 {
+		t.Error("ApplicationMajorVersion was not defaulted to 0")
+	}
+	if opts.ApplicationMinorVersion != 0 {
+		t.Error("ApplicationMinorVersion was not defaulted to 0")
+	}
+	if opts.ApplicationRevisionVersion != 0 {
+		t.Error("ApplicationRevisionVersion was not defaulted to 0")
+	}
+	if opts.MaxFramesInFlight != 2 {
+		t.Error("MaxFramesInFlight was not defaulted to 2")
+	}
 }
 
 func TestSetScaleOnResize(t *testing.T) {
@@ -123,6 +136,17 @@ func TestGameWidthHeight(t *testing.T) {
 	}
 	if GameHeight() != 50 {
 		t.Error("Height didn't return the proper value.")
+	}
+}
+
+func TestGetMaxFramesInFlight(t *testing.T) {
+	Run(RunOptions{
+		HeadlessMode: true,
+		NoRun:        true,
+	}, &testScene{})
+	f := GetMaxFramesInFlight()
+	if opts.MaxFramesInFlight != f {
+		t.Error("GetMaxFramesInFlight returned an incorrect value.")
 	}
 }
 

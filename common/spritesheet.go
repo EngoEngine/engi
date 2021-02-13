@@ -5,12 +5,11 @@ import (
 
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/math"
-	"github.com/EngoEngine/gl"
 )
 
 // Spritesheet is a class that stores a set of tiles from a file, used by tilemaps and animations
 type Spritesheet struct {
-	texture       *gl.Texture     // The original texture
+	texture       TextureID       // The original texture
 	width, height float32         // The dimensions of the total texture
 	cells         []SpriteRegion  // The dimensions of each sprite
 	cache         map[int]Texture // The cell cache cells

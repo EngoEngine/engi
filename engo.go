@@ -150,6 +150,11 @@ type RunOptions struct {
 	// ApplicationXXXVersion is the major, minor, and revision versions of the game.
 	// defaults to 0.0.0
 	ApplicationMajorVersion, ApplicationMinorVersion, ApplicationRevisionVersion int
+
+	// MaxFramesInFlight is the number of frames allowed to be in-flight. Places an
+	// upper-bound on the amount of frames drawn between draw calls. Only works on
+	// Vulkan. Defaults to 2.
+	MaxFramesInFlight int
 }
 
 // Run is called to create a window, initialize everything, and start the main loop. Once this function returns,
@@ -179,6 +184,10 @@ func Run(o RunOptions, defaultScene Scene) {
 
 	if o.GlobalScale.X <= 0 || o.GlobalScale.Y <= 0 {
 		o.GlobalScale = Point{X: 1, Y: 1}
+	}
+
+	if o.MaxFramesInFlight <= 0 {
+		o.MaxFramesInFlight = 2
 	}
 
 	opts = o
@@ -324,4 +333,10 @@ func GetTitle() string {
 // GetApplicationVersion returns the major, minor, and revision of the game.
 func GetApplicationVersion() [3]int {
 	return [3]int{opts.ApplicationMajorVersion, opts.ApplicationMinorVersion, opts.ApplicationRevisionVersion}
+}
+
+// GetMaxFramesInFlight returns the maximum number of frames to be drawn while drawing.
+// Only works on Vulkan.
+func GetMaxFramesInFlight() int {
+	return opts.MaxFramesInFlight
 }

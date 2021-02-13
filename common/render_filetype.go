@@ -19,7 +19,6 @@ import (
 	"github.com/srwiley/rasterx"
 
 	"github.com/EngoEngine/engo"
-	"github.com/EngoEngine/gl"
 )
 
 // imgLoader is the shared imageLoader for all image file formats
@@ -27,7 +26,7 @@ var imgLoader *imageLoader
 
 // TextureResource is the resource used by the RenderSystem. It uses .jpg, .gif, and .png images
 type TextureResource struct {
-	Texture  *gl.Texture
+	Texture  TextureID
 	Width    float32
 	Height   float32
 	Viewport *engo.AABB
@@ -97,23 +96,10 @@ type Image interface {
 }
 
 // UploadTexture sends the image to the GPU, to be kept in GPU RAM
-func UploadTexture(img Image) *gl.Texture {
-	var id *gl.Texture
+func UploadTexture(img Image) TextureID {
+	var id TextureID
 	if !engo.Headless() {
-		id = engo.Gl.CreateTexture()
-
-		engo.Gl.BindTexture(engo.Gl.TEXTURE_2D, id)
-
-		engo.Gl.TexParameteri(engo.Gl.TEXTURE_2D, engo.Gl.TEXTURE_WRAP_S, engo.Gl.CLAMP_TO_EDGE)
-		engo.Gl.TexParameteri(engo.Gl.TEXTURE_2D, engo.Gl.TEXTURE_WRAP_T, engo.Gl.CLAMP_TO_EDGE)
-		engo.Gl.TexParameteri(engo.Gl.TEXTURE_2D, engo.Gl.TEXTURE_MIN_FILTER, engo.Gl.LINEAR)
-		engo.Gl.TexParameteri(engo.Gl.TEXTURE_2D, engo.Gl.TEXTURE_MAG_FILTER, engo.Gl.NEAREST)
-
-		if img.Data() == nil {
-			panic("Texture image data is nil.")
-		}
-
-		engo.Gl.TexImage2D(engo.Gl.TEXTURE_2D, 0, engo.Gl.RGBA, engo.Gl.RGBA, engo.Gl.UNSIGNED_BYTE, img.Data())
+		id = createTextureID(img)
 	}
 	return id
 }
@@ -186,7 +172,7 @@ func LoadedSprite(url string) (*Texture, error) {
 
 // Texture represents a texture loaded in the GPU RAM (by using OpenGL), which defined dimensions and viewport
 type Texture struct {
-	id       *gl.Texture
+	id       TextureID
 	width    float32
 	height   float32
 	viewport engo.AABB
@@ -203,7 +189,7 @@ func (t Texture) Height() float32 {
 }
 
 // Texture returns the OpenGL ID of the Texture.
-func (t Texture) Texture() *gl.Texture {
+func (t Texture) Texture() TextureID {
 	return t.id
 }
 
@@ -215,7 +201,7 @@ func (t Texture) View() (float32, float32, float32, float32) {
 // Close removes the Texture data from the GPU.
 func (t Texture) Close() {
 	if !engo.Headless() {
-		engo.Gl.DeleteTexture(t.id)
+		t.close()
 	}
 }
 

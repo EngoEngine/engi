@@ -1,3 +1,5 @@
+//+build !vulkan
+
 package common
 
 import (
@@ -156,9 +158,10 @@ func (l *textShader) updateBuffer(ren *RenderComponent, space *SpaceComponent) {
 		return
 	}
 
-	if len(ren.BufferContent) < 20*len(txt.Text) {
-		ren.BufferContent = make([]float32, 20*len(txt.Text)) // TODO: update this to actual value?
+	if len(ren.BufferData.BufferContent) < 20*len(txt.Text) {
+		ren.BufferData.BufferContent = make([]float32, 20*len(txt.Text)) // TODO: update this to actual value?
 	}
+
 	// Reset buffer so artifacts don't occur when txt.Text changes
 	for i := 0; i < len(ren.BufferContent); i++ {
 		ren.BufferContent[i] = 0
@@ -167,11 +170,11 @@ func (l *textShader) updateBuffer(ren *RenderComponent, space *SpaceComponent) {
 		return
 	}
 
-	if ren.Buffer == nil {
-		ren.Buffer = engo.Gl.CreateBuffer()
+	if ren.BufferData.Buffer == nil {
+		ren.BufferData.Buffer = engo.Gl.CreateBuffer()
 	}
-	engo.Gl.BindBuffer(engo.Gl.ARRAY_BUFFER, ren.Buffer)
-	engo.Gl.BufferData(engo.Gl.ARRAY_BUFFER, ren.BufferContent, engo.Gl.STATIC_DRAW)
+	engo.Gl.BindBuffer(engo.Gl.ARRAY_BUFFER, ren.BufferData.Buffer)
+	engo.Gl.BufferData(engo.Gl.ARRAY_BUFFER, ren.BufferData.BufferContent, engo.Gl.STATIC_DRAW)
 }
 
 func (l *textShader) generateBufferContent(ren *RenderComponent, space *SpaceComponent, buffer []float32) bool {
@@ -250,20 +253,24 @@ func (l *textShader) generateBufferContent(ren *RenderComponent, space *SpaceCom
 }
 
 func (l *textShader) Draw(ren *RenderComponent, space *SpaceComponent) {
+<<<<<<< HEAD:common/render_shaders_text_gl.go
+	if l.lastBuffer != ren.BufferData.Buffer || ren.BufferData.Buffer == nil {
+=======
 	txt, ok := ren.Drawable.(Text)
 	if !ok {
 		unsupportedType(ren.Drawable)
 	}
 
 	if l.lastBuffer != ren.Buffer || ren.Buffer == nil {
+>>>>>>> master:common/render_shaders_text.go
 		l.updateBuffer(ren, space)
 
-		engo.Gl.BindBuffer(engo.Gl.ARRAY_BUFFER, ren.Buffer)
+		engo.Gl.BindBuffer(engo.Gl.ARRAY_BUFFER, ren.BufferData.Buffer)
 		engo.Gl.VertexAttribPointer(l.inPosition, 2, engo.Gl.FLOAT, false, 20, 0)
 		engo.Gl.VertexAttribPointer(l.inTexCoords, 2, engo.Gl.FLOAT, false, 20, 8)
 		engo.Gl.VertexAttribPointer(l.inColor, 4, engo.Gl.UNSIGNED_BYTE, true, 20, 16)
 
-		l.lastBuffer = ren.Buffer
+		l.lastBuffer = ren.BufferData.Buffer
 	}
 
 	atlas, ok := atlasCache[*txt.Font]

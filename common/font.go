@@ -9,7 +9,6 @@ import (
 	"log"
 
 	"github.com/EngoEngine/engo"
-	"github.com/EngoEngine/gl"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
@@ -256,7 +255,7 @@ func (f *Font) GenerateFontAtlas(c int) FontAtlas {
 
 // A FontAtlas is a representation of some of the Font characters, as an image
 type FontAtlas struct {
-	Texture *gl.Texture
+	Texture TextureID
 	// XLocation contains the X-coordinate of the starting position of all characters
 	XLocation []float32
 	// YLocation contains the Y-coordinate of the starting position of all characters
@@ -291,7 +290,7 @@ type Text struct {
 }
 
 // Texture returns nil because the Text is generated from a FontAtlas. This implements the common.Drawable interface.
-func (t Text) Texture() *gl.Texture { return nil }
+func (t Text) Texture() TextureID { return nil }
 
 // Width returns the width of the Text generated from a FontAtlas. This implements the common.Drawable interface.
 func (t Text) Width() float32 {

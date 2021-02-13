@@ -1,3 +1,5 @@
+//+build !vulkan
+
 package common
 
 import (
