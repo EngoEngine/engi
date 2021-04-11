@@ -9,12 +9,22 @@ const (
 	AxisMin float32 = -1
 )
 
+// Mouse represents the mouse
+type Mouse struct {
+	X, Y             float32
+	ScrollX, ScrollY float32
+	Action           Action
+	Button           MouseButton
+	Modifer          Modifier
+}
+
 // NewInputManager holds onto anything input related for engo
 func NewInputManager() *InputManager {
 	return &InputManager{
 		Touches: make(map[int]Point),
 		axes:    make(map[string]Axis),
 		buttons: make(map[string]Button),
+		actions: make(map[string]InputAction),
 		keys:    NewKeyManager(),
 	}
 }
@@ -31,14 +41,11 @@ type InputManager struct {
 	// and up to 4 on iOS. GLFW can also keep track of the touches. The latest touch is also
 	// recorded in the Mouse so that touches readily work with the common.MouseSystem
 	Touches map[int]Point
-
+	actions map[string]InputAction
 	axes    map[string]Axis
 	buttons map[string]Button
 	keys    *KeyManager
-}
-
-func (im *InputManager) update() {
-	im.keys.update()
+	mouse   *MouseManager
 }
 
 // RegisterAxis registers a new axis which can be used to retrieve inputs which are spectrums.
@@ -57,6 +64,16 @@ func (im *InputManager) RegisterButton(name string, keys ...Key) {
 	}
 }
 
+// RegisterAction registers a new InputAction with the input system.
+func (im *InputManager) RegisterAction(action InputAction) {
+	im.actions[action.Name] = action
+}
+
+// Action returns the registered InputAction with the given name.
+func (im *InputManager) Action(name string) InputAction {
+	return im.actions[name]
+}
+
 // Axis retrieves an Axis with a specified name.
 func (im *InputManager) Axis(name string) Axis {
 	return im.axes[name]
@@ -67,11 +84,10 @@ func (im *InputManager) Button(name string) Button {
 	return im.buttons[name]
 }
 
-// Mouse represents the mouse
-type Mouse struct {
-	X, Y             float32
-	ScrollX, ScrollY float32
-	Action           Action
-	Button           MouseButton
-	Modifer          Modifier
+func (im *InputManager) update() {
+	im.keys.update()
+	if im.mouse == nil {
+		im.mouse = NewMouseManager(&im.Mouse)
+	}
+	im.mouse.Update()
 }
